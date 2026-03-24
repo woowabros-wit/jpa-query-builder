@@ -3,6 +3,7 @@ package builder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -22,9 +23,13 @@ class InsertQueryBuilderTest {
 
     @Test
     void VALUES를_활용해_INSERT_쿼리_생성() {
+        Map<String, String> values = new LinkedHashMap<>();
+        values.put("name", "?");
+        values.put("age", "?");
+        
         String sql = new InsertQueryBuilder()
             .into("users")
-            .values(Map.of("name", "?", "age", "?"))
+            .values(values)
             .build();
 
         assertEquals("INSERT INTO users (name, age) VALUES (?, ?)", sql);
