@@ -25,7 +25,37 @@
     - 실행 가능한 SQL 문자열
     - PreparedSatement에서 직접 사용 가능
 
-### Memo
+## 3단계 - CRUD 완성 & WHERE 조건
+
+### 목표
+
+- 데이터 삽입(INSERT), 수정(UPDATE), 삭제(DELETE)를 위한 쿼리 빌더를 구현
+- SELECT 빌더에 WHERE 조건 기능을 추가
+
+### 기능 요구 사항
+
+- 데이터 추가가 가능한 INSERT 빌더 구현
+- 데이터 수정이 가능한 UPDATE 빌더 구현
+    - SET 절에 여러 컬럼을 지정 가능
+    - WHERE 조건을 통해 수정 대상 특정 가능
+- 데이터 삭제가 가능한 DELETE 빌더 구현
+    - WHERE 조건을 통해 삭제 대상 특정 가능
+- WHERE 절의 AND/OR 조합은 이번 단계에서 제외
+- LinkedHashMap
+
+### 요청 및 응답 명세
+
+- INSERT
+    - 컬럼과 값을 하나씩 추가 가능
+    - Map 형태로 컬럼과 값을 한 번에 추가 가능
+    - 최소 1개 이상의 컬럼-값 쌍이 필요하며, 없으면 예외
+- UPDATE
+    - WHERE절이 없는 경우 빌드 시 예외
+- DELETE
+    - WHERE절이 없는 경우 빌드 시 예외
+- 모든 쿼리에서 파라미터 값은 플레이스홀더(`?`)를 사용
+
+## Memo
 
 Fluent API 패턴이란?
 
