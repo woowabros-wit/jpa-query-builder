@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SelectQueryBuilderTest {
@@ -77,5 +78,23 @@ class SelectQueryBuilderTest {
 
         assertThat(sql1).isEqualTo("SELECT * FROM users ORDER BY id ASC");
         assertThat(sql1).isEqualTo(sql2);
+    }
+
+    @Test
+    void case6() {
+//        테이블 지정(from)은 반드시 호출해야 하며, 호출하지 않으면 IllegalStateException을 발생시킨다.
+
+        assertThatThrownBy(() -> new SelectQueryBuilder().select().build())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("FROM 절이 지정되지 않았습니다.");
+
+    }
+
+    @Test
+    void case7() {
+//       조회 개수 제한(limit)은 양의 정수만 허용하며, 0 이하 값은 IllegalArgumentException을 발생시킨다
+        assertThatThrownBy(() -> new SelectQueryBuilder().select().from("users").limit(0).build())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("양의 정수");
     }
 }

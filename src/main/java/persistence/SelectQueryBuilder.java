@@ -53,6 +53,10 @@ public class SelectQueryBuilder {
      * @return this
      */
     public SelectQueryBuilder limit(int limit) {
+        if (limit <= 0) {
+            throw new IllegalArgumentException("양의 정수");
+        }
+
         this.limit = " LIMIT " + limit;
         return this;
     }
@@ -62,6 +66,10 @@ public class SelectQueryBuilder {
      * @return 생성된 SQL
      */
     public String build() {
+        if (from == null) {
+            throw new IllegalStateException("FROM 절이 지정되지 않았습니다.");
+        }
+
         if (select != null) {
             query.append(select);
         }
