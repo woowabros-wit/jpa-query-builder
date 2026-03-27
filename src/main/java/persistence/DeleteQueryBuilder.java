@@ -28,10 +28,18 @@ public class DeleteQueryBuilder {
      * SQL 생성
      */
     public String build() {
+        if (!isValidQuery(where)) {
+            throw new IllegalStateException();
+        }
+
         return query.append("FROM ")
                 .append(from)
                 .append(" WHERE ")
                 .append(where)
                 .toString();
+    }
+
+    private boolean isValidQuery(String where) {
+        return where != null && !where.isBlank();
     }
 }

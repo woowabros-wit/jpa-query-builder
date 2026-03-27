@@ -59,6 +59,6 @@ public class UpdateQueryBuilder {
     }
 
     private boolean isValidQuery(String where) {
-        return where != null && where.trim().length() > 0;
+        return where != null && !where.isBlank();
     }
 }
