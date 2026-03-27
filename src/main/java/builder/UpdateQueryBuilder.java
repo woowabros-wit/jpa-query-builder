@@ -8,7 +8,7 @@ public class UpdateQueryBuilder {
 
     private String table;
     private Map<String, String> columnValues;
-    private String whereCondition;
+    private WhereCondition whereCondition;
 
     public UpdateQueryBuilder table(String table) {
         this.table = table;
@@ -23,7 +23,7 @@ public class UpdateQueryBuilder {
         return this;
     }
 
-    public UpdateQueryBuilder where(String condition) {
+    public UpdateQueryBuilder where(WhereCondition condition) {
         whereCondition = condition;
         return this;
     }
@@ -32,12 +32,12 @@ public class UpdateQueryBuilder {
         if (table == null || table.isBlank()) {
             throw new IllegalStateException("table은 null일 수 없습니다.");
         }
-        if (whereCondition == null || whereCondition.isBlank()) {
+        if (whereCondition == null) {
             throw new IllegalStateException("where 조건을 반드시 지정해주세요.");
         }
         return "UPDATE " + table
             + " SET " + generateSetString()
-            + " WHERE " + whereCondition;
+            + " WHERE " + whereCondition.generateWhereConditionString();
     }
 
     private String generateSetString() {

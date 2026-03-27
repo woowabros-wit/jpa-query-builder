@@ -1,6 +1,8 @@
 package builder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static builder.Operator.EQ;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ class UpdateQueryBuilderTest {
             .table("users")
             .set("name", "?")
             .set("age", "?")
-            .where("id = ?")
+            .where(new WhereCondition("id", EQ, "?"))
             .build();
 
         assertEquals("UPDATE users SET name = ?, age = ? WHERE id = ?", sql);
@@ -32,7 +34,7 @@ class UpdateQueryBuilderTest {
     void 테이블명_없으면_예외() {
         UpdateQueryBuilder builder = new UpdateQueryBuilder()
             .set("name", "?")
-            .where("id = ?");
+            .where(new WhereCondition("id", EQ, "?"));
 
         assertThrows(IllegalStateException.class, builder::build);
     }

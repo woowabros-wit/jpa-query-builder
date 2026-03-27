@@ -10,9 +10,10 @@ class DeleteQueryBuilderTest {
 
     @Test
     void 쿼리_생성() {
+        WhereCondition whereCondition = new WhereCondition("age", Operator.LT, "?");
         String sql = new DeleteQueryBuilder()
             .from("users")
-            .where("age < ?")
+            .where(whereCondition)
             .build();
 
         assertEquals("DELETE FROM users WHERE age < ?", sql);
@@ -28,8 +29,9 @@ class DeleteQueryBuilderTest {
 
     @Test
     void 테이블명_없으면_예외() {
+        WhereCondition whereCondition = new WhereCondition("age", Operator.LT, "?");
         DeleteQueryBuilder builder = new DeleteQueryBuilder()
-            .where("age < ?");
+            .where(whereCondition);
 
         assertThrows(IllegalStateException.class, builder::build);
     }
