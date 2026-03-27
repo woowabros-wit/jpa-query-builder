@@ -42,6 +42,10 @@ public class UpdateQueryBuilder {
      * SQL 생성
      */
     public String build() {
+        if (!isValidQuery(where)) {
+            throw new IllegalStateException("WHERE 조건이 필수입니다.");
+        }
+
         String set = valueMap.entrySet()
                 .stream()
                 .map(entry -> entry.getKey() + " = " + entry.getValue())
@@ -52,5 +56,9 @@ public class UpdateQueryBuilder {
                 .append(set)
                 .append(" WHERE ").append(where)
                 .toString();
+    }
+
+    private boolean isValidQuery(String where) {
+        return where != null && where.trim().length() > 0;
     }
 }

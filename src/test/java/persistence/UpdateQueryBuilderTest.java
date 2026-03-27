@@ -1,5 +1,6 @@
 package persistence;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,5 +35,35 @@ class UpdateQueryBuilderTest {
                 .build();
 
         assertThat(sql).isEqualTo("UPDATE users SET name = ?, age = ? WHERE id = ?");
+    }
+
+    @Test
+    @DisplayName("UPDATE와 DELETE 쿼리는 WHERE 조건을 필수로 요구한다.")
+    void case2() {
+        UpdateQueryBuilder builder = new UpdateQueryBuilder()
+                .table("users")
+                .set("name", "?");
+
+        assertThrows(IllegalStateException.class, builder::build);
+    }
+
+
+    @Test
+    @DisplayName("INSERT/UPDATE 시 컬럼 순서가 추가한 순서대로 유지된다.")
+    void case3() {
+        assertThat(new UpdateQueryBuilder()
+                .table("users")
+                .set("name", "?")
+                .set("age", "?")
+                .where("id = ?")
+                .build()).isEqualTo("UPDATE users SET name = ?, age = ? WHERE id = ?");
+
+
+        assertThat(new UpdateQueryBuilder()
+                .table("users")
+                .set("age", "?")
+                .set("name", "?")
+                .where("id = ?")
+                .build()).isEqualTo("UPDATE users SET age = ?, name = ? WHERE id = ?");
     }
 }
