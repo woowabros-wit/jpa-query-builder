@@ -41,6 +41,10 @@ public class InsertQueryBuilder {
      * SQL 생성
      */
     public String build() {
+        if (!isValidQuery(valueMap)) {
+            throw new IllegalArgumentException("최소 1개 이상의 컬럼-값 쌍을 가져야 함");
+        }
+
         Set<Map.Entry<String, String>> entries = valueMap.entrySet();
 
         String key = entries.stream().map(Map.Entry::getKey).collect(Collectors.joining(", "));
@@ -51,5 +55,9 @@ public class InsertQueryBuilder {
                 .append("VALUES")
                 .append(" (" + value + ")")
                 .toString();
+    }
+
+    private boolean isValidQuery(Map<String, String> valueMap) {
+        return valueMap != null && !valueMap.isEmpty();
     }
 }
