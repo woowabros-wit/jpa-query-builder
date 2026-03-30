@@ -1,8 +1,9 @@
 package builder.where;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("NonAsciiCharacters")
 class WhereConditionTest {
@@ -65,21 +66,21 @@ class WhereConditionTest {
     @Test
     void where없이_and_호출하면_예외() {
         WhereCondition whereCondition = WhereCondition.empty();
+        ComparisonCondition comparisonCondition = new ComparisonCondition("age", ComparisonOperator.GT, "20");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-            () -> whereCondition.and(new ComparisonCondition("age", ComparisonOperator.GT, "20")));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> whereCondition.and(comparisonCondition));
 
-        assertEquals("AND 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.", exception.getMessage());
+        assertEquals("WHERE 를 우선 지정해주세요.", exception.getMessage());
     }
 
     @Test
     void where없이_or_호출하면_예외() {
         WhereCondition whereCondition = WhereCondition.empty();
+        ComparisonCondition comparisonCondition = new ComparisonCondition("age", ComparisonOperator.GT, "20");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class,
-            () -> whereCondition.or(new ComparisonCondition("age", ComparisonOperator.GT, "20")));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> whereCondition.or(comparisonCondition));
 
-        assertEquals("OR 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.", exception.getMessage());
+        assertEquals("WHERE 를 우선 지정해주세요.", exception.getMessage());
     }
 
     @Test
@@ -101,5 +102,35 @@ class WhereConditionTest {
             "WHERE (((age >= 20) AND (age <= 30)) OR (status = 'ACTIVE')) AND (role = 'ADMIN')",
             whereCondition.toSql()
         );
+    }
+
+    @Test
+    void WhereCondition_2개_and_결합() {
+        WhereCondition condition1 = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "20"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"));
+
+        WhereCondition condition2 = WhereCondition.empty()
+            .where(new ComparisonCondition("status", ComparisonOperator.EQ, "'ACTIVE'"))
+            .and(new ComparisonCondition("role", ComparisonOperator.EQ, "'ADMIN'"));
+
+        WhereCondition result = condition1.and(condition2);
+
+        assertEquals("WHERE ((age >= 20) AND (age <= 30)) AND ((status = 'ACTIVE') AND (role = 'ADMIN'))", result.toSql());
+    }
+
+    @Test
+    void WhereCondition_2개_or_결합() {
+        WhereCondition condition1 = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "20"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"));
+
+        WhereCondition condition2 = WhereCondition.empty()
+            .where(new ComparisonCondition("status", ComparisonOperator.EQ, "'ACTIVE'"))
+            .and(new ComparisonCondition("role", ComparisonOperator.EQ, "'ADMIN'"));
+
+        WhereCondition result = condition1.or(condition2);
+
+        assertEquals("WHERE ((age >= 20) AND (age <= 30)) OR ((status = 'ACTIVE') AND (role = 'ADMIN'))", result.toSql());
     }
 }

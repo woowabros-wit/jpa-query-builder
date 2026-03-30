@@ -14,19 +14,33 @@ public class WhereCondition {
     }
 
     public WhereCondition and(ComparisonCondition condition) {
-        if (this.condition == null) {
-            throw new IllegalStateException("AND 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.");
-        }
+        validateConditionNotNull();
         this.condition = new LogicalCondition(this.condition, condition, LogicalOperator.AND);
         return this;
     }
 
+    public WhereCondition and(WhereCondition whereCondition) {
+        validateConditionNotNull();
+        this.condition = new LogicalCondition(this.condition, whereCondition.condition, LogicalOperator.AND);
+        return this;
+    }
+
     public WhereCondition or(ComparisonCondition condition) {
-        if (this.condition == null) {
-            throw new IllegalStateException("OR 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.");
-        }
+        validateConditionNotNull();
         this.condition = new LogicalCondition(this.condition, condition, LogicalOperator.OR);
         return this;
+    }
+
+    public WhereCondition or(WhereCondition whereCondition) {
+        validateConditionNotNull();
+        this.condition = new LogicalCondition(this.condition, whereCondition.condition, LogicalOperator.OR);
+        return this;
+    }
+
+    private void validateConditionNotNull() {
+        if (this.condition == null) {
+            throw new IllegalStateException("WHERE 를 우선 지정해주세요.");
+        }
     }
 
     public String toSql() {
