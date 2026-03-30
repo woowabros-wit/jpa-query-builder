@@ -18,6 +18,6 @@ public class WhereCondition {
     }
 
     public String generateWhereConditionString() {
-        return column + " " + operator.toSqlString(values);
+        return operator.toSqlString(column, values);
     }
 }

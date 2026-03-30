@@ -40,7 +40,7 @@
     - WHERE 조건을 통해 수정 대상 특정 가능
 - 데이터 삭제가 가능한 DELETE 빌더 구현
     - WHERE 조건을 통해 삭제 대상 특정 가능
-- WHERE 절의 AND/OR 조합은 이번 단계에서 제외
+- WHERE 절의 AND/OR 조합 지원
 - LinkedHashMap
 
 ### 요청 및 응답 명세
@@ -54,6 +54,10 @@
 - DELETE
     - WHERE절이 없는 경우 빌드 시 예외
 - 모든 쿼리에서 파라미터 값은 플레이스홀더(`?`)를 사용
+
+## 4단계 - ResultSet 자동 매핑 & Named Parameter
+
+- TODO
 
 ## Memo
 

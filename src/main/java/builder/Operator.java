@@ -75,8 +75,8 @@ public enum Operator {
         operatorValidator.validate(args);
     }
 
-    public String toSqlString(String... args) {
-        return sqlGenerator.generate(args);
+    public String toSqlString(String column, String... args) {
+        return column + " " + sqlGenerator.generate(args);
     }
 
     @FunctionalInterface
