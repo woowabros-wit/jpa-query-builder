@@ -1,5 +1,7 @@
 package builder;
 
+import builder.where.WhereCondition;
+
 public class DeleteQueryBuilder {
 
     private String table;

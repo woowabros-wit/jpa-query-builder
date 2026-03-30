@@ -1,6 +1,6 @@
-package builder;
+package builder.where;
 
-public enum Operator {
+public enum ComparisonOperator {
     IS_NULL(
         args -> isEqualArgsSize(0, args),
         args -> "IS NULL"
@@ -42,11 +42,11 @@ public enum Operator {
         args -> "BETWEEN " + args[0] + " AND " + args[1]
     ),
     IN(
-        Operator::isEmpty,
+        ComparisonOperator::isEmpty,
         args -> "IN (" + String.join(", ", args) + ")"
     ),
     NOT_IN(
-        Operator::isEmpty,
+        ComparisonOperator::isEmpty,
         args -> "NOT IN (" + String.join(", ", args) + ")"
     ),
     ;
@@ -66,7 +66,7 @@ public enum Operator {
     private final OperatorValidator operatorValidator;
     private final SqlGenerator sqlGenerator;
 
-    Operator(OperatorValidator operatorValidator, SqlGenerator sqlGenerator) {
+    ComparisonOperator(OperatorValidator operatorValidator, SqlGenerator sqlGenerator) {
         this.operatorValidator = operatorValidator;
         this.sqlGenerator = sqlGenerator;
     }

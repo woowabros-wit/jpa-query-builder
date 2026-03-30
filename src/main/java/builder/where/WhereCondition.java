@@ -1,23 +1,23 @@
-package builder;
+package builder.where;
 
 public class WhereCondition {
 
     private String column;
-    private Operator operator;
+    private ComparisonOperator comparisonOperator;
     private String[] values;
 
-    public WhereCondition(String column, Operator operator, String... values) {
+    public WhereCondition(String column, ComparisonOperator comparisonOperator, String... values) {
         if (column == null || column.isBlank()) {
             throw new IllegalStateException("컬럼명은 null 또는 빈 문자열일 수 없습니다.");
         }
-        operator.validate(values);
+        comparisonOperator.validate(values);
 
         this.column = column;
-        this.operator = operator;
+        this.comparisonOperator = comparisonOperator;
         this.values = values;
     }
 
     public String generateWhereConditionString() {
-        return operator.toSqlString(column, values);
+        return comparisonOperator.toSqlString(column, values);
     }
 }

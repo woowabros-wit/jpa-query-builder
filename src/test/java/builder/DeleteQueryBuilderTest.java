@@ -3,6 +3,8 @@ package builder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import builder.where.ComparisonOperator;
+import builder.where.WhereCondition;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("NonAsciiCharacters")
@@ -10,7 +12,7 @@ class DeleteQueryBuilderTest {
 
     @Test
     void 쿼리_생성() {
-        WhereCondition whereCondition = new WhereCondition("age", Operator.LT, "?");
+        WhereCondition whereCondition = new WhereCondition("age", ComparisonOperator.LT, "?");
         String sql = new DeleteQueryBuilder()
             .from("users")
             .where(whereCondition)
@@ -29,7 +31,7 @@ class DeleteQueryBuilderTest {
 
     @Test
     void 테이블명_없으면_예외() {
-        WhereCondition whereCondition = new WhereCondition("age", Operator.LT, "?");
+        WhereCondition whereCondition = new WhereCondition("age", ComparisonOperator.LT, "?");
         DeleteQueryBuilder builder = new DeleteQueryBuilder()
             .where(whereCondition);
 
