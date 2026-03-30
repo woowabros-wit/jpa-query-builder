@@ -1,182 +1,105 @@
 package builder.where;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("NonAsciiCharacters")
 class WhereConditionTest {
 
     @Test
-    void IS_NULL_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("name", ComparisonOperator.IS_NULL);
-        assertEquals("name IS NULL", condition.generateWhereConditionString());
+    void where조건_추가() {
+        WhereCondition whereCondition = WhereCondition.empty();
+
+        whereCondition.where(new ComparisonCondition("age", ComparisonOperator.GT, "20"));
+
+        assertEquals("WHERE age > 20", whereCondition.toSql());
     }
 
     @Test
-    void IS_NOT_NULL_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("email", ComparisonOperator.IS_NOT_NULL);
-        assertEquals("email IS NOT NULL", condition.generateWhereConditionString());
+    void 단일where조건() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("name", ComparisonOperator.EQ, "'kim'"));
+
+        assertEquals("WHERE name = 'kim'", whereCondition.toSql());
     }
 
     @Test
-    void EQ_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("age", ComparisonOperator.EQ, "30");
-        assertEquals("age = 30", condition.generateWhereConditionString());
+    void and_추가() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "18"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"));
+
+        assertEquals("WHERE (age >= 18) AND (age <= 30)", whereCondition.toSql());
     }
 
     @Test
-    void NE_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("status", ComparisonOperator.NE, "'active'");
-        assertEquals("status != 'active'", condition.generateWhereConditionString());
+    void or_추가() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("name", ComparisonOperator.EQ, "'kim'"))
+            .or(new ComparisonCondition("name", ComparisonOperator.EQ, "'lee'"));
+
+        assertEquals("WHERE (name = 'kim') OR (name = 'lee')", whereCondition.toSql());
     }
 
     @Test
-    void GT_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("price", ComparisonOperator.GT, "100");
-        assertEquals("price > 100", condition.generateWhereConditionString());
+    void and_여러번_추가() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "20"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"))
+            .and(new ComparisonCondition("status", ComparisonOperator.EQ, "'ACTIVE'"));
+
+        assertEquals("WHERE ((age >= 20) AND (age <= 30)) AND (status = 'ACTIVE')", whereCondition.toSql());
     }
 
     @Test
-    void LT_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("quantity", ComparisonOperator.LT, "50");
-        assertEquals("quantity < 50", condition.generateWhereConditionString());
+    void and_or_혼합_추가() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "20"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"))
+            .or(new ComparisonCondition("role", ComparisonOperator.EQ, "'ADMIN'"));
+
+        assertEquals("WHERE ((age >= 20) AND (age <= 30)) OR (role = 'ADMIN')", whereCondition.toSql());
     }
 
     @Test
-    void GTE_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("rating", ComparisonOperator.GTE, "4.5");
-        assertEquals("rating >= 4.5", condition.generateWhereConditionString());
+    void where없이_and_호출하면_예외() {
+        WhereCondition whereCondition = WhereCondition.empty();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> whereCondition.and(new ComparisonCondition("age", ComparisonOperator.GT, "20")));
+
+        assertEquals("AND 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.", exception.getMessage());
     }
 
     @Test
-    void LTE_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("discount", ComparisonOperator.LTE, "20");
-        assertEquals("discount <= 20", condition.generateWhereConditionString());
+    void where없이_or_호출하면_예외() {
+        WhereCondition whereCondition = WhereCondition.empty();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+            () -> whereCondition.or(new ComparisonCondition("age", ComparisonOperator.GT, "20")));
+
+        assertEquals("OR 조건을 추가하기 전에 먼저 WHERE 조건을 지정해주세요.", exception.getMessage());
     }
 
     @Test
-    void LIKE_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("name", ComparisonOperator.LIKE, "%John%");
-        assertEquals("name LIKE '%John%'", condition.generateWhereConditionString());
+    void 조건이_없으면_빈문자열() {
+        WhereCondition whereCondition = WhereCondition.empty();
+
+        assertEquals("", whereCondition.toSql());
     }
 
     @Test
-    void BETWEEN_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("price", ComparisonOperator.BETWEEN, "100", "200");
-        assertEquals("price BETWEEN 100 AND 200", condition.generateWhereConditionString());
-    }
+    void 복잡한조건조합이정확하게생성된다() {
+        WhereCondition whereCondition = WhereCondition.empty()
+            .where(new ComparisonCondition("age", ComparisonOperator.GTE, "20"))
+            .and(new ComparisonCondition("age", ComparisonOperator.LTE, "30"))
+            .or(new ComparisonCondition("status", ComparisonOperator.EQ, "'ACTIVE'"))
+            .and(new ComparisonCondition("role", ComparisonOperator.EQ, "'ADMIN'"));
 
-    @Test
-    void IN_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("category", ComparisonOperator.IN, "'electronics'", "'books'", "'clothing'");
-        assertEquals("category IN ('electronics', 'books', 'clothing')", condition.generateWhereConditionString());
-    }
-
-    @Test
-    void NOT_IN_연산자_sql_생성() {
-        WhereCondition condition = new WhereCondition("status", ComparisonOperator.NOT_IN, "'inactive'", "'banned'");
-        assertEquals("status NOT IN ('inactive', 'banned')", condition.generateWhereConditionString());
-    }
-
-    @Test
-    void 컬럼명이_null이면_예외_발생() {
-        assertThrows(IllegalStateException.class, () -> new WhereCondition(null, ComparisonOperator.EQ, "value"));
-    }
-
-    @Test
-    void 컬럼명이_빈_문자열이면_예외_발생() {
-        assertThrows(IllegalStateException.class, () -> new WhereCondition("", ComparisonOperator.EQ, "value"));
-    }
-
-    @Test
-    void 컬럼명이_공백만_있으면_예외_발생() {
-        assertThrows(IllegalStateException.class, () -> new WhereCondition("   ", ComparisonOperator.EQ, "value"));
-    }
-
-    @Test
-    void IS_NULL_연산자는_값이_0개_필요() {
-        assertDoesNotThrow(() -> new WhereCondition("name", ComparisonOperator.IS_NULL));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("name", ComparisonOperator.IS_NULL, "value"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("name", ComparisonOperator.IS_NULL, "value1", "value2"));
-    }
-
-    @Test
-    void IS_NOT_NULL_연산자는_값이_0개_필요() {
-        assertDoesNotThrow(() -> new WhereCondition("email", ComparisonOperator.IS_NOT_NULL));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("email", ComparisonOperator.IS_NOT_NULL, "value"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("email", ComparisonOperator.IS_NOT_NULL, "value1", "value2"));
-    }
-
-    @Test
-    void EQ_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("age", ComparisonOperator.EQ));
-        assertDoesNotThrow(() -> new WhereCondition("email", ComparisonOperator.EQ, "10"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("age", ComparisonOperator.EQ, "30", "40"));
-    }
-
-    @Test
-    void NE_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("status", ComparisonOperator.NE));
-        assertDoesNotThrow(() -> new WhereCondition("status", ComparisonOperator.NE, "active"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("status", ComparisonOperator.NE, "active", "inactive"));
-    }
-
-    @Test
-    void GT_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("price", ComparisonOperator.GT));
-        assertDoesNotThrow(() -> new WhereCondition("price", ComparisonOperator.GT, "100"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("price", ComparisonOperator.GT, "100", "200"));
-    }
-
-    @Test
-    void LT_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("quantity", ComparisonOperator.LT));
-        assertDoesNotThrow(() -> new WhereCondition("quantity", ComparisonOperator.LT, "50"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("quantity", ComparisonOperator.LT, "50", "100"));
-    }
-
-    @Test
-    void GTE_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("rating", ComparisonOperator.GTE));
-        assertDoesNotThrow(() -> new WhereCondition("rating", ComparisonOperator.GTE, "4.5"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("rating", ComparisonOperator.GTE, "4.5", "5.0"));
-    }
-
-    @Test
-    void LTE_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("discount", ComparisonOperator.LTE));
-        assertDoesNotThrow(() -> new WhereCondition("discount", ComparisonOperator.LTE, "20"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("discount", ComparisonOperator.LTE, "20", "30"));
-    }
-
-    @Test
-    void LIKE_연산자는_정확히_1개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("name", ComparisonOperator.LIKE));
-        assertDoesNotThrow(() -> new WhereCondition("name", ComparisonOperator.LIKE, "%John%"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("name", ComparisonOperator.LIKE, "%John%", "%Jane%"));
-    }
-
-    @Test
-    void BETWEEN_연산자는_정확히_2개의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("price", ComparisonOperator.BETWEEN, "100"));
-        assertDoesNotThrow(() -> new WhereCondition("price", ComparisonOperator.BETWEEN, "100", "200"));
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("price", ComparisonOperator.BETWEEN, "100", "200", "300"));
-    }
-
-    @Test
-    void IN_연산자는_최소_1개_이상의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("category", ComparisonOperator.IN));
-        assertDoesNotThrow(() -> new WhereCondition("category", ComparisonOperator.IN, "'electronics'"));
-        assertDoesNotThrow(() -> new WhereCondition("category", ComparisonOperator.IN, "'electronics'", "'books'", "'clothing'"));
-    }
-
-    @Test
-    void NOT_IN_연산자는_최소_1개_이상의_값_필요() {
-        assertThrows(IllegalArgumentException.class, () -> new WhereCondition("status", ComparisonOperator.NOT_IN));
-        assertDoesNotThrow(() -> new WhereCondition("status", ComparisonOperator.NOT_IN, "'inactive'"));
-        assertDoesNotThrow(() -> new WhereCondition("status", ComparisonOperator.NOT_IN, "'inactive'", "'banned'"));
+        assertEquals(
+            "WHERE (((age >= 20) AND (age <= 30)) OR (status = 'ACTIVE')) AND (role = 'ADMIN')",
+            whereCondition.toSql()
+        );
     }
 }

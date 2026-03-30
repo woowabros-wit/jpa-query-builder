@@ -1,5 +1,6 @@
 package builder;
 
+import builder.where.ComparisonCondition;
 import builder.where.WhereCondition;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,8 +25,19 @@ public class UpdateQueryBuilder {
         return this;
     }
 
-    public UpdateQueryBuilder where(WhereCondition condition) {
-        whereCondition = condition;
+    public UpdateQueryBuilder where(ComparisonCondition condition) {
+        whereCondition = WhereCondition.empty();
+        whereCondition.where(condition);
+        return this;
+    }
+
+    public UpdateQueryBuilder and(ComparisonCondition condition) {
+        whereCondition.and(condition);
+        return this;
+    }
+
+    public UpdateQueryBuilder or(ComparisonCondition condition) {
+        whereCondition.or(condition);
         return this;
     }
 
@@ -38,7 +50,7 @@ public class UpdateQueryBuilder {
         }
         return "UPDATE " + table
             + " SET " + generateSetString()
-            + " WHERE " + whereCondition.generateWhereConditionString();
+            + " " + whereCondition.toSql();
     }
 
     private String generateSetString() {
