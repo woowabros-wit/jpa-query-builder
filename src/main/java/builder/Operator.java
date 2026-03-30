@@ -17,34 +17,36 @@ public enum Operator {
         args -> isEqualArgsSize(1, args),
         args -> "!= " + args[0]
     ),
-    GT(args ->
-        isEqualArgsSize(1, args),
+    GT(
+        args -> isEqualArgsSize(1, args),
         args -> "> " + args[0]
     ),
-    LT(args ->
-        isEqualArgsSize(1, args),
+    LT(
+        args -> isEqualArgsSize(1, args),
         args -> "< " + args[0]
     ),
-    GTE(args ->
-        isEqualArgsSize(1, args),
+    GTE(
+        args -> isEqualArgsSize(1, args),
         args -> ">= " + args[0]
     ),
-    LTE(args ->
-        isEqualArgsSize(1, args),
+    LTE(
+        args -> isEqualArgsSize(1, args),
         args -> "<= " + args[0]
     ),
-    LIKE(args ->
-        isEqualArgsSize(1, args),
+    LIKE(
+        args -> isEqualArgsSize(1, args),
         args -> "LIKE '" + args[0] + "'"
     ),
-    BETWEEN(args ->
-        isEqualArgsSize(2, args),
+    BETWEEN(
+        args -> isEqualArgsSize(2, args),
         args -> "BETWEEN " + args[0] + " AND " + args[1]
     ),
-    IN(Operator::isEmpty,
+    IN(
+        Operator::isEmpty,
         args -> "IN (" + String.join(", ", args) + ")"
     ),
-    NOT_IN(Operator::isEmpty,
+    NOT_IN(
+        Operator::isEmpty,
         args -> "NOT IN (" + String.join(", ", args) + ")"
     ),
     ;
@@ -79,11 +81,13 @@ public enum Operator {
 
     @FunctionalInterface
     private interface OperatorValidator {
+
         void validate(String... args);
     }
 
     @FunctionalInterface
     private interface SqlGenerator {
+
         String generate(String... args);
     }
 }
