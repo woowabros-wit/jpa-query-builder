@@ -102,6 +102,14 @@ class SelectQueryBuilderTest {
                 .hasMessage("limit 는 0보다 큰 정수여야 합니다. limit: %d", limit);
     }
 
+    @ParameterizedTest(name = "where - condition 이 null 또는 빈 문자열인 경우 에러. condition: [{0}]")
+    @BlankSource
+    void where(String condition) throws Exception {
+        assertThatThrownBy(() -> new SelectQueryBuilder().where(condition))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("WHERE 조건은 null 또는 빈 문자열일 수 없습니다.");
+    }
+
     @Nested
     class BuildSelectTest {
 
@@ -266,6 +274,22 @@ class SelectQueryBuilderTest {
                             FROM table
                             ORDER BY column1 ASC
                             LIMIT 10
+                            """.stripTrailing()
+                    },
+                    {
+                            new SelectQueryBuilder()
+                                    .select("column1")
+                                    .from("table")
+                                    .orderBy("column1", "ASC")
+                                    .limit(20)
+                                    .where("column1 > 10")
+                                    .build(),
+                            """
+                            SELECT column1
+                            FROM table
+                            WHERE column1 > 10
+                            ORDER BY column1 ASC
+                            LIMIT 20
                             """.stripTrailing()
                     }
             };

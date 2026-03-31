@@ -16,6 +16,7 @@ public class SelectQueryBuilder {
     private String orderByColumn;
     private Direction direction;
     private int limit;
+    private String whereCondition;
 
     /**
      * SELECT 절 지정
@@ -78,6 +79,12 @@ public class SelectQueryBuilder {
         return this;
     }
 
+    public SelectQueryBuilder where(String condition) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(condition), "WHERE 조건은 null 또는 빈 문자열일 수 없습니다.");
+        this.whereCondition = condition;
+        return this;
+    }
+
     /**
      * SQL 문자열 생성
      * @return 생성된 SQL
@@ -95,10 +102,16 @@ public class SelectQueryBuilder {
         }
         builder.append("\n");
         builder.append("FROM ").append(table);
+        if (StringUtils.isNotBlank(whereCondition)) {
+            builder.append("\n");
+            builder.append("WHERE ").append(whereCondition);
+        }
+
         if (StringUtils.isNotBlank(orderByColumn)) {
             builder.append("\n");
             builder.append("ORDER BY ").append(orderByColumn).append(" ").append(direction.name());
         }
+
         if (limit > 0) {
             builder.append("\n");
             builder.append("LIMIT ").append(limit);
