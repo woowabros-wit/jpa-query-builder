@@ -1,39 +1,39 @@
 package builder.where;
 
-public class WhereCondition {
+public class WhereClause {
 
     private Condition condition;
 
-    public static WhereCondition empty() {
-        return new WhereCondition();
+    public static WhereClause empty() {
+        return new WhereClause();
     }
 
-    public WhereCondition where(ComparisonCondition condition) {
+    public WhereClause where(ComparisonCondition condition) {
         this.condition = condition;
         return this;
     }
 
-    public WhereCondition and(ComparisonCondition condition) {
+    public WhereClause and(ComparisonCondition condition) {
         validateConditionNotNull();
         this.condition = new LogicalCondition(this.condition, condition, LogicalOperator.AND);
         return this;
     }
 
-    public WhereCondition and(WhereCondition whereCondition) {
+    public WhereClause and(WhereClause whereClause) {
         validateConditionNotNull();
-        this.condition = new LogicalCondition(this.condition, whereCondition.condition, LogicalOperator.AND);
+        this.condition = new LogicalCondition(this.condition, whereClause.condition, LogicalOperator.AND);
         return this;
     }
 
-    public WhereCondition or(ComparisonCondition condition) {
+    public WhereClause or(ComparisonCondition condition) {
         validateConditionNotNull();
         this.condition = new LogicalCondition(this.condition, condition, LogicalOperator.OR);
         return this;
     }
 
-    public WhereCondition or(WhereCondition whereCondition) {
+    public WhereClause or(WhereClause whereClause) {
         validateConditionNotNull();
-        this.condition = new LogicalCondition(this.condition, whereCondition.condition, LogicalOperator.OR);
+        this.condition = new LogicalCondition(this.condition, whereClause.condition, LogicalOperator.OR);
         return this;
     }
 

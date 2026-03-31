@@ -1,12 +1,12 @@
 package builder;
 
 import builder.where.ComparisonCondition;
-import builder.where.WhereCondition;
+import builder.where.WhereClause;
 
 public class DeleteQueryBuilder {
 
     private String table;
-    private WhereCondition whereCondition;
+    private WhereClause whereClause;
 
     public DeleteQueryBuilder from(String table) {
         this.table = table;
@@ -14,18 +14,18 @@ public class DeleteQueryBuilder {
     }
 
     public DeleteQueryBuilder where(ComparisonCondition condition) {
-        whereCondition = WhereCondition.empty();
-        whereCondition.where(condition);
+        whereClause = WhereClause.empty();
+        whereClause.where(condition);
         return this;
     }
 
     public DeleteQueryBuilder and(ComparisonCondition condition) {
-        whereCondition.and(condition);
+        whereClause.and(condition);
         return this;
     }
 
     public DeleteQueryBuilder or(ComparisonCondition condition) {
-        whereCondition.or(condition);
+        whereClause.or(condition);
         return this;
     }
 
@@ -33,10 +33,10 @@ public class DeleteQueryBuilder {
         if (table == null || table.isBlank()) {
             throw new IllegalStateException("table은 null일 수 없습니다.");
         }
-        if (whereCondition == null) {
+        if (whereClause == null) {
             throw new IllegalStateException("where 조건을 반드시 지정해주세요.");
         }
         return "DELETE FROM " + table
-            + " " + whereCondition.toSql();
+            + " " + whereClause.toSql();
     }
 }
