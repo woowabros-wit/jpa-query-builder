@@ -10,6 +10,7 @@ public class SelectQueryBuilder {
     private String from = null;
     private String orderBy = null;
     private String limit = null;
+    private String where = null;
 
     /**
      * SELECT 절 지정
@@ -61,6 +62,12 @@ public class SelectQueryBuilder {
         return this;
     }
 
+    public SelectQueryBuilder where(String condition) {
+        this.where = condition;
+
+        return this;
+    }
+
     /**
      * SQL 문자열 생성
      * @return 생성된 SQL
@@ -76,6 +83,10 @@ public class SelectQueryBuilder {
 
         if (from != null) {
             query.append(from);
+        }
+
+        if (where != null) {
+            query.append(" WHERE ").append(where);
         }
 
         if (orderBy != null) {

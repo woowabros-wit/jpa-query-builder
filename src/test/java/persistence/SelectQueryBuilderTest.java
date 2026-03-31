@@ -97,4 +97,15 @@ class SelectQueryBuilderTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("양의 정수");
     }
+
+    @Test
+    void SELECT에_WHERE_절_추가() {
+        String sql = new SelectQueryBuilder()
+                .select("id", "name")
+                .from("users")
+                .where("age >= ?")
+                .build();
+
+        assertEquals("SELECT id, name FROM users WHERE age >= ?", sql);
+    }
 }
