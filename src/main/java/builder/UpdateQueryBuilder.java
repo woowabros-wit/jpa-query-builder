@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UpdateQueryBuilder {
+public class UpdateQueryBuilder implements Query {
 
     private String table;
     private Map<String, String> columnValues;
@@ -41,6 +41,7 @@ public class UpdateQueryBuilder {
         return this;
     }
 
+    @Override
     public String build() {
         if (table == null || table.isBlank()) {
             throw new IllegalStateException("table은 null일 수 없습니다.");

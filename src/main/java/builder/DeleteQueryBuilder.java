@@ -3,7 +3,7 @@ package builder;
 import builder.where.ComparisonCondition;
 import builder.where.WhereClause;
 
-public class DeleteQueryBuilder {
+public class DeleteQueryBuilder implements Query {
 
     private String table;
     private WhereClause whereClause;
@@ -29,6 +29,7 @@ public class DeleteQueryBuilder {
         return this;
     }
 
+    @Override
     public String build() {
         if (table == null || table.isBlank()) {
             throw new IllegalStateException("table은 null일 수 없습니다.");
