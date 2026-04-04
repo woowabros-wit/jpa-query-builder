@@ -70,6 +70,7 @@ public class ResultSetMapper {
             if (value != null) {
                 field.set(instance, convertType(value, field.getType()));
             }
+            field.setAccessible(false);
         }
 
         return instance;
@@ -103,6 +104,9 @@ public class ResultSetMapper {
         }
         if (value instanceof Number number && NUMBER_CONVERTERS.containsKey(targetType)) {
             return NUMBER_CONVERTERS.get(targetType).apply(number);
+        }
+        if (value instanceof Boolean bool && (targetType == boolean.class || targetType == Boolean.class)) {
+            return bool;
         }
         if (value instanceof Timestamp timestamp && targetType == LocalDateTime.class) {
             return timestamp.toLocalDateTime();
