@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class InsertQueryBuilder {
+public class InsertQueryBuilder implements Query {
 
     private String table;
     private Map<String, String> columnValues;
@@ -32,6 +32,7 @@ public class InsertQueryBuilder {
         }
     }
 
+    @Override
     public String build() {
         if (table == null || table.isBlank()) {
             throw new IllegalStateException("table은 null일 수 없습니다.");

@@ -40,7 +40,7 @@
     - WHERE 조건을 통해 수정 대상 특정 가능
 - 데이터 삭제가 가능한 DELETE 빌더 구현
     - WHERE 조건을 통해 삭제 대상 특정 가능
-- WHERE 절의 AND/OR 조합은 이번 단계에서 제외
+- WHERE 절의 AND/OR 조합 지원
 - LinkedHashMap
 
 ### 요청 및 응답 명세
@@ -54,6 +54,42 @@
 - DELETE
     - WHERE절이 없는 경우 빌드 시 예외
 - 모든 쿼리에서 파라미터 값은 플레이스홀더(`?`)를 사용
+
+## 4단계 - ResultSet 자동 매핑 & Named Parameter
+
+### 목표
+
+- 데이터베이스 조회 결과(ResultSet)를 Java 객체로 자동 변환하는 매핑 시스템 구현
+
+### 기능 요구사항
+
+- ResultSet의 각 행을 Reflection을 사용해 Java 객체로 자동 변환
+    - private 필드에 접근하기 위해 setAccessible(true)를 사용
+
+#### 매핑 규칙
+
+- 매핑 대상 클래스에 기본 생성자가 없으면 예외 발생
+- 데이터베이스 컬럼과 매칭되는 Java 필드가 없으면 해당 컬럼은 무시
+
+#### 컬럼명
+
+- 데이터베이스 컬럼명(snake_case)을 Java 필드명(camelCase)으로 자동 변환
+    - ex: DB 컬럼 created_at → Java 필드 createdAt
+    - ex: DB 컬럼 user_name → Java 필드 userName
+
+#### 타입 변환
+
+- JDBC 타입을 Java 타입으로 자동 변환
+    - ex: SQL INTEGER → Java int/Integer/long/Long
+    - ex: SQL VARCHAR → Java String
+    - ex: SQL TIMESTAMP → Java LocalDateTime
+    - ex: SQL BOOLEAN → Java boolean/Boolean
+- 타입이 일치하지 않으면 예외 발생
+- 타입 지원 대상
+    - 단순 기본 타입(primitive)
+    - 래퍼 타입(wrapper)
+    - String, LocalDateTime
+    - 미지원: 컬렉션 타입(List, Set 등)
 
 ## Memo
 

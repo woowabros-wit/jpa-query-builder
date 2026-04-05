@@ -1,6 +1,6 @@
 package builder;
 
-public class SelectQueryBuilder {
+public class SelectQueryBuilder implements Query {
 
     private String[] columns;
     private String table;
@@ -34,6 +34,7 @@ public class SelectQueryBuilder {
         return this;
     }
 
+    @Override
     public String build() {
         validateTable();
 
