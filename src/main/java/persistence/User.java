@@ -7,6 +7,8 @@ public class User {
     private Integer age;
     private String email;
 
+    private Integer height;
+
     // 기본 생성자 필수!
     public User() {}
 
@@ -41,5 +43,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
     }
 }
