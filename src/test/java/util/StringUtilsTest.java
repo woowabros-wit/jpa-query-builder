@@ -8,9 +8,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import testutil.TestArrayUtils;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringUtilsTest {
 
@@ -113,6 +115,45 @@ class StringUtilsTest {
     void allNotBlank1() throws Exception {
         final String[] input = new String[] {"a"};
         assertThat(StringUtils.allNotBlank(input)).isTrue();
+    }
+
+    @ParameterizedTest(name = "camelCaseToSnakeCase - 입력값이 null 이거나 빈 문자열인 경우 에러. input: [{0}]")
+    @BlankSource
+    void camelCaseToSnakeCase(String str) throws Exception {
+        assertThatThrownBy(() -> StringUtils.camelCaseToSnakeCase(str))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("str 은 null 또는 빈 문자열일 수 없습니다.");
+    }
+
+    @DisplayName("camelCaseToSnakeCase - 입력값이 첫번째 글자가 대문자인 경우 에러")
+    @Test
+    void camelCaseToSnakeCase1() throws Exception {
+        // given
+        final String str = "CamelCase";
+
+        // when
+        assertThatThrownBy(() -> StringUtils.camelCaseToSnakeCase(str))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("camelCase 는 첫 글자가 소문자여야 합니다. str: [%s]", str);
+
+    }
+
+    @ParameterizedTest(name = "camelCaseToSnakeCase - 입력값에 특수문자가 포함된경우 에러. input: [{0}]")
+    @MethodSource("camelCaseToSnakeCase2")
+    void camelCaseToSnakeCase2(String str) throws Exception {
+        assertThatThrownBy(() -> StringUtils.camelCaseToSnakeCase(str))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("camelCase 는 영문자와 숫자로만 구성되어야 합니다. str: [%s]", str);
+    }
+
+    private static Stream<Arguments> camelCaseToSnakeCase2() {
+        return Stream.of(
+                Arguments.of("_camelCase"),
+                Arguments.of("camel-case"),
+                Arguments.of("camel case"),
+                Arguments.of("camelCase!"),
+                Arguments.of("camel_case")
+        );
     }
 
 }
